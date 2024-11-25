@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
+import 'package:async/async.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,11 +10,10 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Future Demo - Samuel',
+      title: 'Flutter Demo - Samuel',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -31,17 +32,14 @@ class FuturePage extends StatefulWidget {
 
 class _FuturePageState extends State<FuturePage> {
   String result = '';
-  bool isLoading = false; // Menandakan status loading
 
-  // Fungsi untuk mendapatkan data dari API
-  Future<http.Response> getData() async {
+  Future<Response> getData() async {
     const authority = 'www.googleapis.com';
     const path = '/books/v1/volumes/junbDwAAQBAJ';
     Uri url = Uri.https(authority, path);
     return http.get(url);
   }
 
-  // Fungsi asinkron untuk mengembalikan angka
   Future<int> returnOneAsync() async {
     await Future.delayed(const Duration(seconds: 3));
     return 1;
@@ -57,29 +55,62 @@ class _FuturePageState extends State<FuturePage> {
     return 3;
   }
 
-  // Fungsi untuk menghitung total
-  Future<void> count() async {
-    setState(() {
-      isLoading = true; // Set loading menjadi true
-    });
-    
+  Future count() async {
     int total = 0;
     total = await returnOneAsync();
     total += await returnTwoAsync();
     total += await returnThreeAsync();
-    
     setState(() {
       result = total.toString();
-      isLoading = false; // Set loading menjadi false
     });
   }
 
-  // Fungsi untuk menangani error
-  Future<void> returnError() async {
-    setState(() {
-      isLoading = true; // Set loading menjadi true
+  late Completer completer;
+
+  Future getNumber() {
+    completer = Completer<int>();
+    calculate();
+    return completer.future;
+  }
+
+  calculate() async {
+    try {
+      await new Future.delayed(const Duration(seconds: 5));
+      completer.complete(42);
+    } catch (_) {
+      completer.completeError({});
+    }
+  }
+
+  void returnFG() {
+    Future.wait<int>([
+      returnOneAsync(),
+      returnTwoAsync(),
+      returnThreeAsync(),
+    ]).then((List<int> value) {
+      int total = 0;
+      for (var element in value) {
+        total += element;
+      }
+      setState(() {
+        result = total.toString();
+      });
     });
-    
+  }
+
+  Future handleError() async {
+    try {
+      await returnError();
+    } catch (error) {
+      setState(() {
+        result = error.toString();
+      });
+    } finally {
+      print('Complete');
+    }
+  }
+
+  Future returnError() async {
     await Future.delayed(const Duration(seconds: 2));
     throw Exception('Something terrible happened!');
   }
@@ -88,41 +119,59 @@ class _FuturePageState extends State<FuturePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Back from the Future'),
+        title: const Text('Back From Future'),
         backgroundColor: Colors.blue,
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // Menyusun kolom di tengah
           children: [
+            const Spacer(),
             ElevatedButton(
-              child: const Text('GO!'),
               onPressed: () {
-                // Panggil returnError dan tangani hasilnya
-                returnError()
-                    .then((value) {
-                      setState(() {
-                        result = 'Success';
-                      });
-                    })
-                    .catchError((onError) {
-                      setState(() {
-                        result = onError.toString(); // Menampilkan pesan error
-                      });
-                    })
-                    .whenComplete(() {
-                      print('Complete'); // Mencetak 'Complete' di konsol
-                      setState(() {
-                        isLoading = false; // Set loading menjadi false setelah selesai
-                      });
-                    });
+                returnError().then((value) {
+                  setState(() {
+                    result = 'Success';
+                  });
+                }).catchError((onError) {
+                  setState(() {
+                    result = onError.toString();
+                  });
+                }).whenComplete(() => print('Complete'));
+
+                // returnFG();
+
+                // getNumber().then((value) {
+                //   setState(() {
+                //     result = value.toString();
+                //   });
+                // }).catchError((e) {
+                //   result = 'An error occurred';
+                // });
+
+                // getNumber().then((value) {
+                //   setState(() {
+                //     result = value.toString();
+                //   });
+                // });
+
+                // count();
+                // setState(() {});
+                // getData().then((value) {
+                //   result = value.body.toString().substring(0, 450);
+                //   result = value.toString();
+                //   setState(() {});
+                // }).catchError((_) {
+                //   result = 'An error occured';
+                //   setState(() {});
+                // });
               },
+              child: const Text('Go!'),
             ),
-            const SizedBox(height: 20), // Jarak antara tombol dan teks
+            const Spacer(),
             Text(result),
-            const SizedBox(height: 20), // Jarak antara teks dan indikator loading
-            if (isLoading) // Menampilkan indikator loading hanya saat loading
-              const CircularProgressIndicator(),
+            const Spacer(),
+            const CircularProgressIndicator(),
+            const Spacer(),
           ],
         ),
       ),
