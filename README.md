@@ -1,16 +1,30 @@
-# flutter_pertemuan11
+NAMA    : SAMUEL RIVALDO SARAGIH
+KELAS   : 2B TRPL
+NIM     : 362358302156
 
-A new Flutter project.
 
-## Getting Started
+# PRAKTIKUM 1
+![gambar](image.png)
+# PRAKTIKUM 2
+![gambar](image-1.png)
+# PRAKTIKUM 3
+![gambar](image-2.png)
+# PRAKTIKUM 4
+![gambar](image-4.png)
 
-This project is a starting point for a Flutter application.
+# Future.wait
 
-A few resources to get you started if this is your first Flutter project:
+Fungsi: Menunggu beberapa tugas (Future) sekaligus.
+Cara kerja: Semua tugas harus diberikan dalam satu daftar. Selesai ketika semua tugas selesai.
+Kesalahan: Jika satu tugas gagal, akan langsung mengembalikan kesalahan.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+# FutureGroup
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Fungsi: Menunggu beberapa tugas, tetapi bisa menambahkan tugas satu per satu.
+Cara kerja: Tugas ditambahkan secara dinamis. Setelah semua ditambahkan, panggil close untuk menunggu selesai.
+Kesalahan: Jika ada tugas yang gagal, tetap bisa menambahkan tugas baru.
+
+# PRAKTIKUM 5
+![gambar](image-5.png)
+hasil dari prsaktikum 5 hasilnya beda sama dengann yang ada di modul
+![gambar](image-6.png)
